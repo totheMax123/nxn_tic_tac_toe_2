@@ -15,6 +15,8 @@ class Board(object):
     def __init__(self, dimensions, n):
         self.dimensions = dimensions
         self.n = n
+        self.num_spaces = self.n**self.dimensions
+        
         if dimensions == 2:
             self.board = [[' ' for j in range(n)] for i in range(n)]
         elif dimensions == 3:
@@ -22,6 +24,7 @@ class Board(object):
         else:
             self.board = []
 
+        self.linear_board = [' ' for i in range(self.num_spaces)]
         self.space_nums = [i + 1 for i in range(n**dimensions)]
 
     def __eq__(self, other):
@@ -34,30 +37,17 @@ class Board(object):
         if other.n != self.n:
             return False
 
-        for i in range(self.n):
-            for j in range(self.n):
-                if self.dimensions == 3:
-                    for k in range(self.n):
-                        if self.board[i][j][k] != other.board[i][j][k]:
-                            return False
-                else:
-                    if self.board[i][j] != other.board[i][j]:
-                        return False
+        for i in range(self.num_spaces):
+            if self.linear_board[i] != other.linear_board[i]:
+                return False
 
         return True
 
     def __hash__(self):
         result = ''
 
-        if self.dimensions == 3:
-            for i in range(self.n):
-                for j in range(self.n):
-                    for k in range(self.n):
-                        result += self.board[i][j][k]
-        else:
-            for i in range(self.n):
-                for j in range(self.n):
-                    result += self.board[i][j]
+        for i in range(self.num_spaces):
+            result += self.linear_board[i]
 
         result = result.replace('X', '1')
         result = result.replace('O', '2')
@@ -75,11 +65,51 @@ class Board(object):
 
     def static_eval(self, depth, winner):
         if winner == 'X':
-            return (self.n**self.dimensions + 1) - depth
+            return (self.num_spaces + 1) - depth
         elif winner == 'O':
-            return -(self.n**self.dimensions + 1) + depth
+            return -(self.num_spaces + 1) + depth
         else:
             return 0
+
+    def move(self, pos, symbol):
+        '''
+        Function makes a move for any player (or a blank for minimax)
+        Returns the validity of the move
+        '''
+        if self.dimensions == 3:
+            i = int(pos / (self.n**2))
+            j = (int(pos / self.n)) % self.n
+            k = pos % self.n
+
+            if symbol == ' ':
+                self.board[i][j][k] = symbol
+            elif self.board[i][j][k] == ' ' and symbol != ' ':
+                self.board[i][j][k] = symbol
+            else:
+                return False
+
+            self.linear_board = []
+            for i in range(self.n):
+                for j in range(self.n):
+                    for k in range(self.n):
+                        self.linear_board.append(self.board[i][j][k])
+        else:
+            i = int(pos / self.n)
+            j = pos % self.n
+
+            if symbol == ' ':
+                self.board[i][j] = symbol
+            elif self.board[i][j] == ' ' and symbol != ' ':
+                self.board[i][j] = symbol
+            else:
+                return False
+
+            self.linear_board = []
+            for i in range(self.n):
+                for j in range(self.n):
+                    self.linear_board.append(self.board[i][j])
+        
+        return True
 
     def check_win_2d(self, i=0):
         '''

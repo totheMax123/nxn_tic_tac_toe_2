@@ -31,7 +31,6 @@ def minimax_2d(board, depth, alpha, beta, maximizing_player):
     X is the maximizing player
     '''
     
-    linear_board = [space for row in board.board for space in row]
     empty_spaces = []
     winner = board.check_win_2d()
     max_depth = int(5 / (board.n - 2)) + 5
@@ -40,8 +39,8 @@ def minimax_2d(board, depth, alpha, beta, maximizing_player):
         print('Thinking...')
         print(max_depth)
 
-    for i in range(len(linear_board)):
-        if linear_board[i] == ' ':
+    for i in range(len(board.linear_board)):
+        if board.linear_board[i] == ' ':
             empty_spaces.append(i)
     
     if len(empty_spaces) == 0 or winner or depth >= 10: # figure out last condition
@@ -58,20 +57,17 @@ def minimax_2d(board, depth, alpha, beta, maximizing_player):
         order = sorted(evals, key=evals.get, reverse=True)
 
         # Loop through next possible moves in order
-        for space in order:
-            i = int(space / board.n)
-            j = space % board.n
-            
-            board.board[i][j] = 'X'
+        for space in order:            
+            board.move(space, 'X')
             evaluation = minimax_2d(board, depth + 1, alpha, beta, False)[0]
-            board.board[i][j] = ' '
+            board.move(space, ' ')
             max_eval = max(max_eval, evaluation)
 
             alpha = max(alpha, evaluation)
             if beta <= alpha:
                 break
         
-        return max_eval, [i, j]
+        return max_eval, space
     else:
         min_eval = 1000000
         evals = {}
@@ -84,16 +80,13 @@ def minimax_2d(board, depth, alpha, beta, maximizing_player):
 
         # Loop through next possible moves in order
         for space in order:
-            i = int(space / board.n)
-            j = space % board.n
-            
-            board.board[i][j] = 'O'
+            board.move(space, 'O')
             evaluation = minimax_2d(board, depth + 1, alpha, beta, True)[0]
-            board.board[i][j] = ' '
+            board.move(space, ' ')
             
             if evaluation < min_eval:
                 min_eval = evaluation
-                best_index = [i, j]
+                best_index = space
 
             beta = min(beta, evaluation)
             if beta <= alpha:
@@ -110,7 +103,6 @@ def minimax_2d(board, depth, alpha, beta, maximizing_player):
 @lru_cache(maxsize=100000)
 def minimax_3d(board, depth, alpha, beta, maximizing_player):
     # TODO: OPTIMIZE AND MAKE THIS RUN FASTER
-    linear_board = [space for layer in board.board for row in layer for space in row]
     empty_spaces = []
     winner = board.check_win_3d()
     max_depth = int(6 / (board.n - 1)) + 4
@@ -118,8 +110,8 @@ def minimax_3d(board, depth, alpha, beta, maximizing_player):
     if depth == 0:
         print('Thinking...')
 
-    for i in range(len(linear_board)):
-        if linear_board[i] == ' ':
+    for i in range(len(board.linear_board)):
+        if board.linear_board[i] == ' ':
             empty_spaces.append(i)
 
     if len(empty_spaces) == 0 or winner or depth >= max_depth: # figure out last condition
@@ -136,13 +128,9 @@ def minimax_3d(board, depth, alpha, beta, maximizing_player):
 
         # Loop through next possible moves
         for space in order:
-            i = int(space / (board.n**2))
-            j = (int(space / board.n)) % board.n
-            k = space % board.n
-            
-            board.board[i][j][k] = 'X'
+            board.move(space, 'X')
             evaluation = minimax_3d(board, depth + 1, alpha, beta, False)[0]
-            board.board[i][j][k] = ' '
+            board.move(space, ' ')
             max_eval = max(max_eval, evaluation)
 
             alpha = max(alpha, evaluation)
@@ -161,13 +149,9 @@ def minimax_3d(board, depth, alpha, beta, maximizing_player):
         
         # Loop through next possible moves
         for space in order:
-            i = int(space / (board.n**2))
-            j = (int(space / board.n)) % board.n
-            k = space % board.n
-            
-            board.board[i][j][k] = 'O'
+            board.move(space, 'O')
             evaluation = minimax_3d(board, depth + 1, alpha, beta, True)[0]
-            board.board[i][j][k] = ' '
+            board.move(space, ' ')
             
             if evaluation < min_eval:
                 min_eval = evaluation
@@ -194,8 +178,10 @@ def player_o(board, moves):
         k = 0
         win, loc = board.almost_win_2d()
 
+        '''
         if win:
             for i in range(board.n):
+                # TODO: CALCULATE SPACE NUMBERS
                 if (win == 'dia' and loc == 0
                     and board.board[i][i] == ' '):
                     return i, i, k
@@ -206,13 +192,12 @@ def player_o(board, moves):
                     return loc, i, k
                 elif win == 'col' and board.board[i][loc] == ' ':
                     return i, loc, k
-
+        '''
         if board.n > 3 and moves < 4:
-            move = random.randint(0, board.n**board.dimensions - 1)
-            i = int(move / board.n)
-            j = move % board.n
+            move = random.randint(0, board.num_spaces - 1)
         else:
-            i, j = minimax_2d(board, 0, -1000000, 1000000, False)[-1]
+            move = minimax_2d(board, 0, -1000000, 1000000, False)[-1]
+            print(move)
             #print(minimax_2d.cache_info())
     else:
         win, loc = board.almost_win_3d()
@@ -231,6 +216,7 @@ def player_o(board, moves):
                         return max_index - i, max_index - i, i
             
             for i in range(board.n):
+                # TODO: CALCULATE SPACE NUMBERS
                 if win == 'v_col' and board[i][loc[0]][loc[-1]] == ' ':
                     return i, loc[0], loc[-1]
                 elif win == 'row' and board.board[loc[0]][loc[-1]][i] == ' ':
@@ -255,14 +241,14 @@ def player_o(board, moves):
                         return i, max_index - i, loc[0]
         
         '''
-        move = random.randint(1, board.n**board.dimensions)
+        move = random.randint(1, board.num_spaces)
         i = int(move / (board.n**2))
         j = (int(move / board.n)) % board.n
         k = move % board.n
         '''
-        i, j, k = minimax_3d(board, 0, -1000000, 1000000, False)[-1]
+        move = minimax_3d(board, 0, -1000000, 1000000, False)[-1]
     
-    return i, j, k
+    return move
 
 def play_3d(board):
     '''
@@ -327,11 +313,9 @@ def play_3d(board):
             valid = False
             while not valid:
                 move = player_o(board, moves)
-                
-                if board.board[move[0]][move[1]][move[2]] == ' ':
-                    board.board[move[0]][move[1]][move[2]] = 'O'
-                    moves += 1
-                    valid = True
+                valid = board.move(move, 'O')
+
+            moves += 1
             print(board)
 
     print(board)
@@ -373,23 +357,17 @@ def play_2d(board):
         while not valid:
             move = int(input('Type the name of the space you\'d'
                              + ' like to put an X in: '))
-        
             clear()
             
-            for index in range(len(board.space_nums)):
-                i = int(index / board.n)
-                j = index % board.n
-                if board.space_nums[index] == move and board.board[i][j] == ' ':
-                    board.board[i][j] = 'X'
-                    valid = True
-                    moves += 1
-                    break
-                if valid:
-                    break
-                elif not valid and index == len(board.space_nums) - 1:
-                    print('Invalid move!')
-                    print(board)
+            valid = board.move(move - 1, 'X')
+            if valid:
+                break
+            elif not valid:
+                print('Invalid move!')
+                print(board)
 
+        moves += 1
+        
         if board.check_win_2d() and moves >= 4:
             break
         elif moves >= board.n**2:
@@ -400,11 +378,9 @@ def play_2d(board):
             valid = False
             while not valid:
                 move = player_o(board, moves)
-                print(move)
-                if board.board[move[0]][move[1]] == ' ':
-                    board.board[move[0]][move[1]] = 'O'
-                    moves += 1
-                    valid = True
+                valid = board.move(move, 'O')
+
+            moves += 1
             print(board)
 
     print(board)
