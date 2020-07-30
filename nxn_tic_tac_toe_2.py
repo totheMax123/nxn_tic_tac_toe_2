@@ -37,7 +37,6 @@ def minimax_2d(board, depth, alpha, beta, maximizing_player):
 
     if depth == 0:
         print('Thinking...')
-        print(max_depth)
 
     for i in range(len(board.linear_board)):
         if board.linear_board[i] == ' ':
@@ -178,21 +177,20 @@ def player_o(board, moves):
         k = 0
         win, loc = board.almost_win_2d()
 
-        '''
         if win:
             for i in range(board.n):
                 # TODO: CALCULATE SPACE NUMBERS
                 if (win == 'dia' and loc == 0
                     and board.board[i][i] == ' '):
-                    return i, i, k
+                    return board.convert_coords(-1, i, i)
                 elif (win == 'dia' and loc == 1
                       and board.board[i][max_index - i] == ' '):
-                    return i, max_index - i, k
+                    return board.convert_coords(-1, i, max_index - i)
                 elif win == 'row' and board.board[loc][i] == ' ':
-                    return loc, i, k
+                    return board.convert_coords(-1, loc, i)
                 elif win == 'col' and board.board[i][loc] == ' ':
-                    return i, loc, k
-        '''
+                    return board.convert_coords(-1, i, loc)
+        
         if board.n > 3 and moves < 4:
             move = random.randint(0, board.num_spaces - 1)
         else:

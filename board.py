@@ -71,15 +71,33 @@ class Board(object):
         else:
             return 0
 
+    def convert_coords(self, space=-1, i=-1, j=-1, k=-1):
+        if space == -1:
+            if self.dimensions == 3:
+                space = i * self.n**2
+                space += j * self.n
+                space += k
+            else:
+                space = i * self.n
+                space += j
+            return space
+        else:
+            if self.dimensions == 2:
+                i = int(space / self.n)
+                j = space % self.n
+            else:
+                i = int(space / (self.n**2))
+                j = (int(space / self.n)) % self.n
+                k = space % self.n
+        return i, j, k
+                
     def move(self, pos, symbol):
         '''
         Function makes a move for any player (or a blank for minimax)
         Returns the validity of the move
         '''
         if self.dimensions == 3:
-            i = int(pos / (self.n**2))
-            j = (int(pos / self.n)) % self.n
-            k = pos % self.n
+            i, j, k = self.convert_coords(pos)
 
             if symbol == ' ':
                 self.board[i][j][k] = symbol
@@ -94,8 +112,7 @@ class Board(object):
                     for k in range(self.n):
                         self.linear_board.append(self.board[i][j][k])
         else:
-            i = int(pos / self.n)
-            j = pos % self.n
+            i, j, k = self.convert_coords(pos)
 
             if symbol == ' ':
                 self.board[i][j] = symbol
@@ -381,6 +398,12 @@ class Board(object):
 
 if __name__ == '__main__':
     # Test code. Don't want this to run when imported
+    board = Board(3, 3)
+    print(board.convert_coords(13))
+    print(board.convert_coords(-1, 0, 1, 1))
+
+
+    '''
     b1 = Board(3, 3)
     b1.board[1][1][1] = 'X'
     b1.board[0][1][1] = 'X'
@@ -388,7 +411,7 @@ if __name__ == '__main__':
     print(b1)
     print(b1.check_win_3d())
     
-    '''
+    
     b1 = Board(3, 3)
     b1.board[0][1][1] = 'X'
     evals = {}
