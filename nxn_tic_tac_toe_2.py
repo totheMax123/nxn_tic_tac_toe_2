@@ -32,7 +32,11 @@ def minimax_2d(board, depth, alpha, beta, maximizing_player):
     '''
     
     empty_spaces = []
-    winner = board.check_win_2d()
+    winner = False
+
+    if depth > 3:
+        winner = board.check_win_2d()
+        
     max_depth = int(5 / (board.n - 2)) + 5
 
     if depth == 0:
@@ -42,7 +46,7 @@ def minimax_2d(board, depth, alpha, beta, maximizing_player):
         if board.linear_board[i] == ' ':
             empty_spaces.append(i)
     
-    if len(empty_spaces) == 0 or winner or depth >= 10: # figure out last condition
+    if winner or len(empty_spaces) == 0 or depth >= 10: # figure out last condition
         return board.static_eval(depth, winner), 0
 
     if maximizing_player:
@@ -103,7 +107,11 @@ def minimax_2d(board, depth, alpha, beta, maximizing_player):
 def minimax_3d(board, depth, alpha, beta, maximizing_player):
     # TODO: OPTIMIZE AND MAKE THIS RUN FASTER
     empty_spaces = []
-    winner = board.check_win_3d()
+    winner = False
+
+    if depth > 3:
+        winner = board.check_win_3d()
+        
     max_depth = int(6 / (board.n - 1)) + 4
 
     if depth == 0:
@@ -136,7 +144,7 @@ def minimax_3d(board, depth, alpha, beta, maximizing_player):
             if beta <= alpha:
                 break
             
-        return max_eval, [i, j, k]
+        return max_eval, space
     else:
         min_eval = 1000000
         evals = {}
@@ -154,7 +162,7 @@ def minimax_3d(board, depth, alpha, beta, maximizing_player):
             
             if evaluation < min_eval:
                 min_eval = evaluation
-                best_index = [i, j, k]
+                best_index = space
 
             beta = min(beta, evaluation)
             if beta <= alpha:
@@ -179,7 +187,6 @@ def player_o(board, moves):
 
         if win:
             for i in range(board.n):
-                # TODO: CALCULATE SPACE NUMBERS
                 if (win == 'dia' and loc == 0
                     and board.board[i][i] == ' '):
                     return board.convert_coords(-1, i, i)
@@ -204,14 +211,15 @@ def player_o(board, moves):
             if win == 'cross_dia':
                 for i in range(board.n):
                     if loc == 0 and board.board[i][i][i] == ' ':
-                        return i, i, i
+                        return board.convert_coords(-1, i, i, i)
                     elif loc == 1 and board.board[i][max_index - i][i] == ' ':
-                        return i, max_index - i, i
+                        return board.convert_coords(-1, i, max_index - i, i)
                     elif loc == 2 and board.board[max_index - i][i][i] == ' ':
-                        return max_index - i, i, i
+                        return board.convert_coords(-1, max_index - i, i, i)
                     elif (loc == 3 and
                           board.board[max_index - i][max_index - i][i] == ' '):
-                        return max_index - i, max_index - i, i
+                        return board.convert_coords(-1, max_index - i,
+                                                    max_index - i, i)
             
             for i in range(board.n):
                 # TODO: CALCULATE SPACE NUMBERS

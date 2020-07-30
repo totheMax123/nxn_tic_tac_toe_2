@@ -97,34 +97,24 @@ class Board(object):
         Returns the validity of the move
         '''
         if self.dimensions == 3:
-            i, j, k = self.convert_coords(pos)
+            i = int(pos / (self.n**2))
+            j = (int(pos / self.n)) % self.n
+            k = pos % self.n
 
-            if symbol == ' ':
+            if (self.board[i][j][k] == ' ' and symbol != ' ') or symbol == ' ':
                 self.board[i][j][k] = symbol
-            elif self.board[i][j][k] == ' ' and symbol != ' ':
-                self.board[i][j][k] = symbol
+                self.linear_board[pos] = symbol
             else:
                 return False
-
-            self.linear_board = []
-            for i in range(self.n):
-                for j in range(self.n):
-                    for k in range(self.n):
-                        self.linear_board.append(self.board[i][j][k])
         else:
-            i, j, k = self.convert_coords(pos)
+            i = int(pos / self.n)
+            j = pos % self.n
 
-            if symbol == ' ':
+            if (self.board[i][j] == ' ' and symbol != ' ') or symbol == ' ':
                 self.board[i][j] = symbol
-            elif self.board[i][j] == ' ' and symbol != ' ':
-                self.board[i][j] = symbol
+                self.linear_board[pos] = symbol
             else:
                 return False
-
-            self.linear_board = []
-            for i in range(self.n):
-                for j in range(self.n):
-                    self.linear_board.append(self.board[i][j])
         
         return True
 
