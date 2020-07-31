@@ -46,9 +46,8 @@ class Board(object):
     def __hash__(self):
         result = ''
 
-        for i in range(self.num_spaces):
-            result += self.linear_board[i]
-
+        result = result.join(self.linear_board)
+        
         result = result.replace('X', '1')
         result = result.replace('O', '2')
         result = result.replace(' ', '0')
@@ -258,6 +257,68 @@ class Board(object):
 
         return None, None
 
+    def optimized_almost_win_2d(self):
+        '''
+        An idea
+        board_str = str(self.__hash__())
+
+        for i in range(self.num_spaces):
+        '''
+        
+        if self.dimensions == 3:
+            full_board = self.board
+            self.board = self.board[i]
+        
+        max_index = self.n - 1
+        l_diagonal = []
+        r_diagonal = []
+        winning_lines = []
+        
+        for i in range(self.n):
+            column = []
+            row = []
+            for j in range(self.n):
+                column.append(self.board[j][i])
+                row.append(self.board[i][j])
+            winning_lines.append(column)
+            winning_lines.append(row)
+            l_diagonal.append(self.board[i][i])
+            r_diagonal.append(self.board[i][max_index - i])
+
+        winning_lines.append(l_diagonal)
+        winning_lines.append(r_diagonal)
+
+        if self.dimensions == 3:
+            self.board = full_board
+
+        
+        '''
+        Having an issue with blank spaces
+        Namely, two blank spaces and an O count as an almost win
+        '''
+
+        for line in winning_lines:
+            prev_space = line[0]
+            almost_win = True
+            player = ' '
+
+            if 'X' in line or 'O' in line:
+                for space in line:
+                    if space != prev_space and space != ' ':
+                        almost_win = False
+                        break
+
+                if space != ' ':
+                    player = space
+                    
+                prev_space = space
+                
+                if almost_win:
+                    return player
+
+        return None
+        
+
     def almost_win_3d(self, send_sums=False):
         max_index = self.n - 1
         ret = []
@@ -384,15 +445,13 @@ if __name__ == '__main__':
     # Test code. Don't want this to run when imported
     #board = Board(3, 3)
     #print(board.convert_coords(0, 1, 1))
-
-
     
     b1 = Board(2, 3)
-    b1.move(1, 'O')
-    b1.move(4, 'O')
-    b1.move(7, 'O')
+    b1.move(0, 'O')
+    #b1.move(4, 'X')
+    b1.move(8, 'O')
     print(b1)
-    print(b1.check_win_linear_2d())
+    print(b1.optimized_almost_win_2d())
     
     '''
     b1 = Board(3, 3)

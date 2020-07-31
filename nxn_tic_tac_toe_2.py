@@ -46,7 +46,7 @@ def minimax_2d(board, depth, alpha, beta, maximizing_player):
         if board.linear_board[i] == ' ':
             empty_spaces.append(i)
     
-    if winner or len(empty_spaces) == 0 or depth >= 10: # figure out last condition
+    if winner or len(empty_spaces) == 0 or depth >= max_depth:
         return board.static_eval(depth, winner), 0
 
     if maximizing_player:
