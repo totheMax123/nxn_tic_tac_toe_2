@@ -189,14 +189,14 @@ def player_o(board, moves):
             for i in range(board.n):
                 if (win == 'dia' and loc == 0
                     and board.board[i][i] == ' '):
-                    return board.convert_coords(-1, i, i)
+                    return board.convert_coords(i, i)
                 elif (win == 'dia' and loc == 1
                       and board.board[i][max_index - i] == ' '):
-                    return board.convert_coords(-1, i, max_index - i)
+                    return board.convert_coords(i, max_index - i)
                 elif win == 'row' and board.board[loc][i] == ' ':
-                    return board.convert_coords(-1, loc, i)
+                    return board.convert_coords(loc, i)
                 elif win == 'col' and board.board[i][loc] == ' ':
-                    return board.convert_coords(-1, i, loc)
+                    return board.convert_coords(i, loc)
         
         if board.n > 3 and moves < 4:
             move = random.randint(0, board.num_spaces - 1)
@@ -211,40 +211,40 @@ def player_o(board, moves):
             if win == 'cross_dia':
                 for i in range(board.n):
                     if loc == 0 and board.board[i][i][i] == ' ':
-                        return board.convert_coords(-1, i, i, i)
+                        return board.convert_coords(i, i, i)
                     elif loc == 1 and board.board[i][max_index - i][i] == ' ':
-                        return board.convert_coords(-1, i, max_index - i, i)
+                        return board.convert_coords(i, max_index - i, i)
                     elif loc == 2 and board.board[max_index - i][i][i] == ' ':
-                        return board.convert_coords(-1, max_index - i, i, i)
+                        return board.convert_coords(max_index - i, i, i)
                     elif (loc == 3 and
                           board.board[max_index - i][max_index - i][i] == ' '):
-                        return board.convert_coords(-1, max_index - i,
+                        return board.convert_coords(max_index - i,
                                                     max_index - i, i)
             
             for i in range(board.n):
                 # TODO: CALCULATE SPACE NUMBERS
                 if win == 'v_col' and board[i][loc[0]][loc[-1]] == ' ':
-                    return i, loc[0], loc[-1]
+                    return board.convert_coords(i, loc[0], loc[-1])
                 elif win == 'row' and board.board[loc[0]][loc[-1]][i] == ' ':
-                    return loc[0], loc[-1], i
+                    return board.convert_coords(loc[0], loc[-1], i)
                 elif win == 'col' and board.board[loc[0]][i][loc[-1]] == ' ':
-                    return loc[0], i, loc[-1]
+                    return board.convert_coords(loc[0], i, loc[-1])
                 if win == 'dia':
                     if loc[-1] == 0 and board.board[loc[0]][i][i] == ' ':
-                        return loc[0], i, i
+                        return board.convert_coords(loc[0], i, i)
                     elif (loc[-1] == 1
                           and board.board[loc[0]][i][max_index - i] == ' '):
-                        return loc[0], i, board.n - i
+                        return board.convert_coords(loc[0], i, max_index - i)
                     elif loc[-1] == 2 and board.board[i][loc[0]][i] == ' ':
-                        return i, loc[0], i
+                        return board.convert_coords(i, loc[0], i)
                     elif (loc[-1] == 3
                           and board.board[i][loc[0]][max_index - i] == ' '):
-                        return i, loc[0], max_index - i
+                        return board.convert_coords(i, loc[0], max_index - i)
                     elif loc[-1] == 4 and board.board[i][i][loc[0]] == ' ':
-                        return i, i, loc[0]
+                        return board.convert_coords(i, i, loc[0])
                     elif (loc[-1] == 5
                           and board.board[i][max_index - i][loc[0]] == ' '):
-                        return i, max_index - i, loc[0]
+                        return board.convert_coords(i, max_index - i, loc[0])
         
         '''
         move = random.randint(1, board.num_spaces)

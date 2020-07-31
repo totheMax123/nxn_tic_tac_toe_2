@@ -71,29 +71,21 @@ class Board(object):
         else:
             return 0
 
-    def convert_coords(self, space=-1, i=-1, j=-1, k=-1):
-        if space == -1:
-            if self.dimensions == 3:
-                space = i * self.n**2
-                space += j * self.n
-                space += k
-            else:
-                space = i * self.n
-                space += j
-            return space
+    def convert_coords(self, i=-1, j=-1, k=-1):
+        if self.dimensions == 3:
+            space = i * self.n**2
+            space += j * self.n
+            space += k
         else:
-            if self.dimensions == 2:
-                i = int(space / self.n)
-                j = space % self.n
-            else:
-                i = int(space / (self.n**2))
-                j = (int(space / self.n)) % self.n
-                k = space % self.n
-        return i, j, k
+            space = i * self.n
+            space += j
+        
+        return space
                 
     def move(self, pos, symbol):
         '''
         Function makes a move for any player (or a blank for minimax)
+        Function then updates the linear board
         Returns the validity of the move
         '''
         if self.dimensions == 3:
@@ -132,6 +124,7 @@ class Board(object):
         l_diagonal = []
         r_diagonal = []
         winning_lines = []
+        
         for i in range(self.n):
             column = []
             row = []
@@ -285,6 +278,7 @@ class Board(object):
         r_dia_sum = [0 for i in range(self.n)]
         u_dia_sum = [0 for i in range(self.n)]
         d_dia_sum = [0 for i in range(self.n)]
+        
         for i in range(self.n):
             for j in range(self.n):
                 for k in range(self.n):
@@ -388,20 +382,19 @@ class Board(object):
 
 if __name__ == '__main__':
     # Test code. Don't want this to run when imported
-    board = Board(3, 3)
-    print(board.convert_coords(13))
-    print(board.convert_coords(-1, 0, 1, 1))
+    #board = Board(3, 3)
+    #print(board.convert_coords(0, 1, 1))
 
 
-    '''
-    b1 = Board(3, 3)
-    b1.board[1][1][1] = 'X'
-    b1.board[0][1][1] = 'X'
-    b1.board[2][1][1] = 'X'
+    
+    b1 = Board(2, 3)
+    b1.move(1, 'O')
+    b1.move(4, 'O')
+    b1.move(7, 'O')
     print(b1)
-    print(b1.check_win_3d())
+    print(b1.check_win_linear_2d())
     
-    
+    '''
     b1 = Board(3, 3)
     b1.board[0][1][1] = 'X'
     evals = {}
