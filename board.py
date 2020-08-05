@@ -257,67 +257,42 @@ class Board(object):
 
         return None, None
 
-    def optimized_almost_win_2d(self):
-        '''
-        An idea
+    def optimized_almost_win_2d(self, send_sums=False):
         board_str = str(self.__hash__())
-
-        for i in range(self.num_spaces):
-        '''
-        
-        if self.dimensions == 3:
-            full_board = self.board
-            self.board = self.board[i]
-        
         max_index = self.n - 1
-        l_diagonal = []
-        r_diagonal = []
-        winning_lines = []
-        
+
+        board_nums = [int(x) if x != '2' else -1 for x in board_str]
+        board_nums = [[board_nums[i] for i in range(j * self.n,
+                                                    (j + 1) * self.n)]
+                      for j in range(0, self.n)]
+
+        row_sums = [0 for i in range(self.n)]
+        col_sums = [0 for i in range(self.n)]
+        l_dia_sum = 0
+        r_dia_sum = 0
+
         for i in range(self.n):
-            column = []
-            row = []
             for j in range(self.n):
-                column.append(self.board[j][i])
-                row.append(self.board[i][j])
-            winning_lines.append(column)
-            winning_lines.append(row)
-            l_diagonal.append(self.board[i][i])
-            r_diagonal.append(self.board[i][max_index - i])
+                row_sums[i] += board_nums[i][j]
+                col_sums[i] += board_nums[j][i]
+            l_dia_sum += board_nums[i][i]
+            r_dia_sum += board_nums[i][max_index - i]
 
-        winning_lines.append(l_diagonal)
-        winning_lines.append(r_diagonal)
+        if send_sums:
+            return row_sums, col_sums, [l_dia_sum, r_dia_sum]
 
-        if self.dimensions == 3:
-            self.board = full_board
+        for i in range(self.n):
+            if abs(row_sums[i]) == 2:
+                return 'X' * (row_sums[i] > 0) + 'O' * (row_sums[i] < 0)
+            if abs(col_sums[i]) == 2:
+                return 'X' * (col_sums[i] > 0) + 'O' * (col_sums[i] < 0)
 
-        
-        '''
-        Having an issue with blank spaces
-        Namely, two blank spaces and an O count as an almost win
-        '''
-
-        for line in winning_lines:
-            prev_space = line[0]
-            almost_win = True
-            player = ' '
-
-            if 'X' in line or 'O' in line:
-                for space in line:
-                    if space != prev_space and space != ' ':
-                        almost_win = False
-                        break
-
-                if space != ' ':
-                    player = space
-                    
-                prev_space = space
-                
-                if almost_win:
-                    return player
+        if abs(l_dia_sum) == 2:
+            return 'X' * (l_dia_sum > 0) + 'O' * (l_dia_sum < 0)
+        if abs(r_dia_sum) == 2:
+            return 'X' * (r_dia_sum > 0) + 'O' * (r_dia_sum < 0)
 
         return None
-        
 
     def almost_win_3d(self, send_sums=False):
         max_index = self.n - 1
@@ -433,11 +408,8 @@ class Board(object):
             self.board[i][j] = player
             sums = self.almost_win_2d(send_sums=True)
             self.board[i][j] = ' '
-
-        total = 0
-        for i in range(len(sums)):
-            for j in range(len(sums[i])):
-                total += sums[i][j]
+        
+        total = sum([x for sublist in sums for x in sublist])
 
         return {move: total}
 
@@ -445,13 +417,16 @@ if __name__ == '__main__':
     # Test code. Don't want this to run when imported
     #board = Board(3, 3)
     #print(board.convert_coords(0, 1, 1))
+    import cProfile
     
-    b1 = Board(2, 3)
+    b1 = Board(2, 4)
     b1.move(0, 'O')
     #b1.move(4, 'X')
-    b1.move(8, 'O')
+    b1.move(1, 'O')
+    b1.move(2, 'O')
     print(b1)
     print(b1.optimized_almost_win_2d())
+    print(cProfile.run('b1.heuristic_eval(1, \'X\')'))
     
     '''
     b1 = Board(3, 3)

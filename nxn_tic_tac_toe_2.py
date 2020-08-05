@@ -39,8 +39,8 @@ def minimax_2d(board, depth, alpha, beta, maximizing_player):
         
     max_depth = int(5 / (board.n - 2)) + 5
 
-    if depth == 0:
-        print('Thinking...')
+    #if depth == 0:
+    #    print('Thinking...')
 
     for i in range(len(board.linear_board)):
         if board.linear_board[i] == ' ':
@@ -95,8 +95,8 @@ def minimax_2d(board, depth, alpha, beta, maximizing_player):
             if beta <= alpha:
                 break
 
-            if depth == 0:
-                print(str(space + 1) + ': ' + str(evaluation))
+            #if depth == 0:
+            #    print(str(space + 1) + ': ' + str(evaluation))
         
         if depth == 0:
             print(minimax_2d.cache_info())
@@ -171,8 +171,8 @@ def minimax_3d(board, depth, alpha, beta, maximizing_player):
             if depth == 0:
                 print(str(space + 1) + ': ' + str(evaluation))
 
-        if depth == 0:
-            print(minimax_3d.cache_info())
+        #if depth == 0:
+        #    print(minimax_3d.cache_info())
         
         return min_eval, best_index
 
